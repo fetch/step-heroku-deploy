@@ -81,25 +81,20 @@ init_gitssh() {
 }
 
 install_toolbelt() {
-    if ! type heroku &> /dev/null; then
-        info 'heroku toolbelt not found, starting installing it';
+    if ! type hk &> /dev/null; then
+        info 'heroku toolbelt (hk) not found, starting installing it';
 
-        sudo apt-get update;
-        sudo apt-get install -y ruby1.9.1;
-        result=$(sudo dpkg -i $WERCKER_STEP_ROOT/foreman-0.60.0.deb $WERCKER_STEP_ROOT/heroku-3.2.0.deb $WERCKER_STEP_ROOT/heroku-toolbelt-3.2.0.deb);
+        HK=/usr/local/bin/hk
+        curl -sL -A "`uname -sp`" https://hk.heroku.com/hk.gz | zcat >$HK
+        chmod +x $HK
 
-        if [[ $? -ne 0 ]]; then
-            warning $result;
-            fail 'heroku toolbelt installation failed';
-        else
-            info 'finished heroku toolbelt installation';
-        fi
+        info 'finished heroku toolbelt (hk) installation';
     else
-        info 'heroku toolbelt is available, and will not be installed by this step';
+        info 'heroku toolbelt (hk) is available, and will not be installed by this step';
     fi
 
-    debug "type heroku: $(type heroku)";
-    debug "heroku version: $(heroku --version)";
+    debug "type hk: $(type hk)";
+    debug "hk version: $(hk version)";
 }
 
 use_wercker_ssh_key() {
@@ -149,11 +144,11 @@ execute_heroku_command() {
     local app_name="$1";
     local command="$2";
 
-    debug "starting heroku run $command";
-    heroku run "$command" --app $app_name;
+    debug "starting hk run $command";
+    hk run "$command" --app $app_name;
     local exit_code_run=$?;
 
-    debug "heroku run exited with $exit_code_run";
+    debug "hk run exited with $exit_code_run";
     return $exit_code_run;
 }
 
